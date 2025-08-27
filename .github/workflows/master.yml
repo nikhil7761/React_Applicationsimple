@@ -1,4 +1,4 @@
-name: React CI/CD + Full Deploy
+name: React CI/CD + Direct Deploy
 
 on:
   push:
@@ -27,20 +27,10 @@ jobs:
     - name: Install sshpass
       run: sudo apt-get update && sudo apt-get install -y sshpass
 
-    - name: Copy all files to Windows EC2
+    - name: Copy React build to Windows EC2 IIS folder
       env:
         EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}
         EC2_HOST: ${{ secrets.EC2_HOST }}
       run: |
-        echo "Copying all files to Windows EC2..."
-        sshpass -p "$EC2_PASSWORD" scp -o StrictHostKeyChecking=no -r ./* administrator@$EC2_HOST:C:/inetpub/
-
-    - name: Run deployment script on Windows EC2
-      env:
-        EC2_PASSWORD: ${{ secrets.EC2_PASSWORD }}
-        EC2_HOST: ${{ secrets.EC2_HOST }}
-      run: |
-        echo "Running deploy.ps1 on Windows EC2..."
-        sshpass -p "$EC2_PASSWORD" ssh -o StrictHostKeyChecking=no administrator@$EC2_HOST "
-          powershell -ExecutionPolicy Bypass -File C:/inetpub/deploy.ps1
-        "
+        echo "Copying React build to IIS..."
+        sshpass -p "$EC2_PASSWORD" scp -o StrictHostKeyChecking=no -r ./build/* administrator@$EC2_HOST:C:/inetpub/wwwroot/
