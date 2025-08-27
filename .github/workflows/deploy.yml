@@ -27,7 +27,7 @@ jobs:
         run: |
           ssh -i ~/.ssh/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} "echo Connected to EC2 & whoami"
 
-      # Step 4: Deploy application files
+      # Step 4: Copy files to Windows EC2
       - name: Copy files to Windows EC2
         run: |
           scp -i ~/.ssh/ec2_key.pem -r ./Build/* ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/C:/automation_Jenkins/Build/
@@ -35,14 +35,14 @@ jobs:
       # Step 5: Run deployment commands remotely
       - name: Run deployment on EC2
         run: |
-          ssh -i ~/.ssh/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
-            echo "Starting deployment..."
-            
-            # Navigate to deployment directory
-            cd C:/automation_Jenkins
+          ssh -i ~/.ssh/ec2_key.pem ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} <<'EOF'
+echo "Starting deployment..."
 
-            # Run PowerShell deployment script
-            powershell -ExecutionPolicy Bypass -File deploy.ps1
+# Navigate to deployment directory
+cd C:/automation_Jenkins
 
-            echo "Deployment completed!"
+# Run PowerShell deployment script
+powershell -ExecutionPolicy Bypass -File deploy.ps1
+
+echo "Deployment completed!"
 EOF
